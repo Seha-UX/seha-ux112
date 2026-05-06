@@ -334,7 +334,61 @@
             للخلايا...</div>
     </div>
 
-    <button class="print-btn" onclick="downloadPDF()">PRINT REPORT</button>
+    <div class="print-controls">
+        <button class="print-btn" onclick="downloadPDF()">تنزيل PDF</button>
+        <button class="share-btn" onclick="sharePDF()">مشاركة التقرير</button>
+    </div>
+
+    <style>
+        .print-controls {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 12px;
+            z-index: 1000;
+        }
+
+        .print-btn, .share-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 22px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 700;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            font-family: 'Cairo', sans-serif;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-size: 14px;
+        }
+
+        .share-btn {
+            background: #25d366;
+        }
+
+        .print-btn:hover, .share-btn:hover {
+            transform: translateY(-3px);
+            filter: brightness(1.1);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+        }
+
+        .print-btn:active, .share-btn:active {
+            transform: translateY(-1px);
+        }
+
+        .print-btn:disabled, .share-btn:disabled {
+            background: #a0a0a0;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        @media print {
+            .print-controls {
+                display: none;
+            }
+        }
+    </style>
 
     <div class="report-paper" id="report-content">
         <div class="header-container" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; background-color: white; direction: ltr;">
@@ -433,11 +487,8 @@
                     src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://seha-ux.github.io/seha-ux/"
                     alt="QR Code" style="width: 110px; height: 110px; margin-top: 10px; margin-bottom: 12px;">
                 <div class="verify-text">
-
-
                     للتحقق من بيانات التقرير يرجى التأكد من زيارة موقع منصة صحة الرسمي<br>
-                    <span style="font-family: 'Inter', sans-serif; font-size: 10px;">To check the report please visit
-                        Seha's offical website</span><br>
+                    <span style="font-family: 'Inter', sans-serif; font-size: 10px;">To check the report please visit Seha's official website</span><br>
                     <a href="https://seha-ux.github.io/seha-ux/" class="verify-link">seha-ux.github.io/seha-ux/</a>
                 </div>
                 <div class="timestamp">
@@ -519,10 +570,7 @@
             
             fields.forEach((field, index) => {
                 let val = data[field];
-                
-                // حماية قصوى لمنع ظهور التاريخ في خانة المستشفى
                 const isTimestamp = (v) => v && v.includes('T') && v.includes('Z') && v.includes(':');
-                
                 if (!val || val === "-- / --" || val.trim() === "/" || val.trim() === "--" || (field === 'hospitalName' && isTimestamp(val))) {
                     if (field === 'hospitalName') {
                         val = "مستشفى الرياض التخصصي / Riyadh Specialized Hospital";
@@ -530,7 +578,6 @@
                         val = "-- / --";
                     }
                 }
-                
                 const parts = val.split(' / ');
                 const arVal = parts[0] ? parts[0].trim() : "--";
                 const enVal = parts[1] ? parts[1].trim() : "--";
@@ -543,7 +590,6 @@
                     const arEl = document.getElementById(baseId + '-ar');
                     const enEl = document.getElementById(baseId + '-en');
                     const centerEl = document.getElementById(baseId);
-
                     if (arEl) arEl.innerHTML = `<span class="arabic-text">${arVal}</span>`;
                     if (enEl) enEl.innerText = enVal;
                     if (centerEl && !arEl) centerEl.innerHTML = `<span class="arabic-text">${arVal}</span>`;
@@ -552,54 +598,34 @@
 
             document.getElementById('v-nid').innerText = data.nationalId;
             const now = new Date(data.createdAt || Date.now());
-
-            let hours = now.getHours();
-            let mins = now.getMinutes();
-            let ampm = hours >= 12 ? 'PM' : 'AM';
-            hours = hours % 12;
-            hours = hours ? hours : 12;
+            let hours = now.getHours(), mins = now.getMinutes(), ampm = hours >= 12 ? 'PM' : 'AM';
+            hours = hours % 12 || 12;
             mins = mins < 10 ? '0' + mins : mins;
             document.getElementById('p-time').innerText = `${hours}:${mins} ${ampm}`;
-
             const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
             const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
             document.getElementById('p-date').innerText = `${days[now.getDay()]}, ${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}`;
-
-            // تحديث رابط الـ QR Code ليكون ديناميكياً بناءً على الصفحة الحالية
             const currentUrl = window.location.href;
             document.getElementById('qr-code-img').src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(currentUrl)}`;
-
-            document.getElementById('loading-overlay').style.display = 'none';
         }
 
         if (leaveId) {
             const finalUrl = `${SCRIPT_URL}?leaveId=${encodeURIComponent(leaveId)}`;
-            
-            fetch(finalUrl, {
-                method: 'GET',
-                redirect: 'follow', // مهم جداً لجوجل سكريبت
-            })
+            fetch(finalUrl, { method: 'GET', redirect: 'follow' })
             .then(async res => {
-                if (!res.ok) throw new Error('Network response was not ok');
                 const data = await res.json();
                 if (data && data.leaveId) { 
                     document.getElementById('loading-overlay').style.display = 'none'; 
                     processData(data); 
                 } else { 
-                    document.getElementById('loading-msg').innerText = "خطأ: لم يتم العثور على بيانات لهذا الرقم في قاعدة البيانات."; 
+                    document.getElementById('loading-msg').innerText = "خطأ: لم يتم العثور على بيانات لهذا الرقم."; 
                 }
             })
             .catch(err => { 
-                console.error('Detailed fetch error:', err);
-                let errorMsg = "خطأ: لم يتم العثور على بيانات لهذا الرقم في قاعدة البيانات.";
-                if (err.toString().includes('TypeError')) {
-                    errorMsg = "خطأ في الاتصال بالخادم. يرجى التأكد من نشر السكريبت كـ Web App.";
-                }
-                document.getElementById('loading-msg').innerHTML = errorMsg; 
+                document.getElementById('loading-msg').innerText = "خطأ في الاتصال بالقاعدة."; 
             });
         }
 
-        // تحويل صورة URL إلى base64 لتجنب مشاكل CORS
         async function imgToBase64(url) {
             return new Promise((resolve) => {
                 const img = new Image();
@@ -617,66 +643,71 @@
             });
         }
 
-        async function downloadPDF() {
+        async function generatePDF(isDownload = true) {
             const element = document.getElementById('report-content');
-            const btn     = document.querySelector('.print-btn');
             const overlay = document.getElementById('loading-overlay');
+            const originalMsg = document.getElementById('loading-msg').innerText;
+            const btns = document.querySelectorAll('.print-btn, .share-btn');
 
-            btn.disabled = true;
-            btn.textContent = 'جاري التصدير بأعلى دقة...';
-
-            // ── حفظ الحالة الأصلية للصور وتحويلها لـ base64 ──
-            const allImgs  = element.querySelectorAll('img');
-            const origSrcs = [];
-            
             try {
-                // تحويل الصور لضمان عدم حدوث مشاكل في التحميل أثناء التصدير
-                for (const img of allImgs) {
-                    origSrcs.push(img.src);
+                btns.forEach(b => b.disabled = true);
+                overlay.style.display = 'flex';
+                document.getElementById('loading-msg').innerText = 'جاري تحضير التقرير بأعلى دقة...';
+
+                const imgs = element.querySelectorAll('img');
+                const originalSrcs = [];
+                for (const img of imgs) {
+                    originalSrcs.push(img.src);
                     img.src = await imgToBase64(img.src);
                 }
+                await new Promise(r => setTimeout(r, 600));
 
-                const opt = {
-                    margin:       0,
-                    filename:     `Sick_Leave_${leaveId || 'report'}.pdf`,
-                    image:        { type: 'jpeg', quality: 1 }, 
-                    html2canvas:  { 
-                        scale: 3, 
-                        useCORS: true, 
-                        letterRendering: false,
-                        backgroundColor: '#ffffff',
-                        logging: false,
-                        scrollY: 0,
-                        windowWidth: 800 // العرض المثالي للورقة A4 لمنع التمدد وعكس النصوص
-                    },
-                    jsPDF:        { 
-                        unit: 'mm', 
-                        format: 'a4', 
-                        orientation: 'portrait',
-                        precision: 32,
-                        compress: true
-                    },
-                    pagebreak: { mode: 'avoid-all' }
-                };
+                const canvas = await html2canvas(element, {
+                    scale: 3.5,
+                    useCORS: true,
+                    logging: false,
+                    backgroundColor: '#ffffff',
+                    windowWidth: 794
+                });
 
-                await html2pdf().set(opt).from(element).save();
+                const imgData = canvas.toDataURL('image/jpeg', 1.0);
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF('p', 'mm', 'a4');
+                const pdfWidth = pdf.internal.pageSize.getWidth();
+                const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+                
+                pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight, undefined, 'FAST');
+                const fileName = `Sick_Leave_${leaveId || 'Report'}.pdf`;
 
-                // استعادة الصور الأصلية
-                allImgs.forEach((img, i) => { img.src = origSrcs[i]; });
-
+                if (isDownload) {
+                    pdf.save(fileName);
+                } else {
+                    const pdfBlob = pdf.output('blob');
+                    const file = new File([pdfBlob], fileName, { type: 'application/pdf' });
+                    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                        await navigator.share({
+                            files: [file],
+                            title: 'تقرير إجازة مرضية',
+                            text: 'مرفق لكم تقرير الإجازة المرضية من منصة صحة'
+                        });
+                    } else {
+                        pdf.save(fileName);
+                        alert('تم تنزيل الملف، ميزة المشاركة غير مدعومة في متصفحك.');
+                    }
+                }
+                imgs.forEach((img, i) => { img.src = originalSrcs[i]; });
             } catch (err) {
-                console.error('PDF export error:', err);
-                // استعادة الصور في حال الخطأ
-                allImgs.forEach((img, i) => { if (origSrcs[i]) img.src = origSrcs[i]; });
+                console.error(err);
                 window.print();
             } finally {
-                btn.disabled      = false;
-                btn.textContent   = 'PRINT REPORT';
+                btns.forEach(b => b.disabled = false);
                 overlay.style.display = 'none';
+                document.getElementById('loading-msg').innerText = originalMsg;
             }
         }
+
+        function downloadPDF() { generatePDF(true); }
+        function sharePDF() { generatePDF(false); }
     </script>
-
 </body>
-
 </html>
