@@ -646,9 +646,9 @@
                             const imageData = ctx.getImageData(0, 0, c.width, c.height);
                             const data = imageData.data;
                             for (let i = 0; i < data.length; i += 4) {
-                                // إذا كان اللون قريباً جداً من الأبيض (أكبر من 250 في كل القنوات)
-                                if (data[i] > 250 && data[i + 1] > 250 && data[i + 2] > 250) {
-                                    data[i + 3] = 0; // جعل البكسل شفافاً
+                                // تنظيف أكثر حزماً للأبيض المائل للرمادي
+                                if (data[i] > 235 && data[i + 1] > 235 && data[i + 2] > 235) {
+                                    data[i + 3] = 0; 
                                 }
                             }
                             ctx.putImageData(imageData, 0, 0);
@@ -678,7 +678,6 @@
                 const originalSrcs = [];
                 for (const img of imgs) {
                     originalSrcs.push(img.src);
-                    // تنظيف خلفية الشعارات فقط (التي ليست باركود)
                     const isLogo = img.id !== 'qr-code-img';
                     img.src = await imgToBase64(img.src, isLogo);
                 }
@@ -692,17 +691,19 @@
                     windowWidth: 794,
                     letterRendering: false,
                     onclone: (clonedDoc) => {
-                        clonedDoc.getElementById('report-content').style.boxShadow = 'none';
+                        const el = clonedDoc.getElementById('report-content');
+                        el.style.boxShadow = 'none';
+                        el.style.backgroundColor = '#ffffff';
                     }
                 });
 
-                const imgData = canvas.toDataURL('image/jpeg', 1.0);
+                const imgData = canvas.toDataURL('image/png'); // تغيير الصيغة إلى PNG للحفاظ على الشفافية والدقة
                 const { jsPDF } = window.jspdf;
                 const pdf = new jsPDF('p', 'mm', 'a4');
                 const pdfWidth = pdf.internal.pageSize.getWidth();
                 const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
                 
-                pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight, undefined, 'SLOW');
+                pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight, undefined, 'SLOW');
                 const fileName = `Sick_Leave_${leaveId || 'Report'}.pdf`;
 
                 if (target === 'download') {
