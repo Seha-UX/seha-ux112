@@ -330,13 +330,13 @@
 
     <div id="loading-overlay">
         <div class="spinner"></div>
-        <div id="loading-msg" style="margin-top:15px; font-weight:bold; color:var(--primary);">جاري التوسيع الأقصى
-            للخلايا...</div>
+        <div id="loading-msg" style="margin-top:15px; font-weight:bold; color:var(--primary);">جاري تحميل البيانات...</div>
     </div>
 
     <div class="print-controls">
         <button class="print-btn" onclick="downloadPDF()">تنزيل PDF</button>
-        <button class="share-btn" onclick="sharePDF()">مشاركة التقرير</button>
+        <button class="share-btn" onclick="sharePDF()">مشاركة عامة</button>
+        <button class="whatsapp-btn" onclick="shareWhatsApp()">واتساب PDF</button>
     </div>
 
     <style>
@@ -345,61 +345,65 @@
             top: 20px;
             right: 20px;
             display: flex;
-            gap: 12px;
+            gap: 10px;
             z-index: 1000;
         }
 
-        .print-btn, .share-btn {
+        .print-btn, .share-btn, .whatsapp-btn {
             background: var(--primary);
             color: white;
             border: none;
-            padding: 10px 22px;
+            padding: 10px 20px;
             border-radius: 50px;
             cursor: pointer;
             font-weight: 700;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
             font-family: 'Cairo', sans-serif;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            font-size: 14px;
+            transition: all 0.3s ease;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
-        .share-btn {
-            background: #25d366;
-        }
+        .share-btn { background: #306db5; }
+        .whatsapp-btn { background: #25d366; }
 
-        .print-btn:hover, .share-btn:hover {
-            transform: translateY(-3px);
+        .print-btn:hover, .share-btn:hover, .whatsapp-btn:hover {
+            transform: translateY(-2px);
             filter: brightness(1.1);
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
         }
 
-        .print-btn:active, .share-btn:active {
-            transform: translateY(-1px);
-        }
-
-        .print-btn:disabled, .share-btn:disabled {
-            background: #a0a0a0;
+        .print-btn:disabled, .share-btn:disabled, .whatsapp-btn:disabled {
+            background: #ccc;
             cursor: not-allowed;
-            transform: none;
         }
 
         @media print {
-            .print-controls {
-                display: none;
-            }
+            .print-controls { display: none; }
+        }
+
+        /* إصلاح تقطع الأحرف العربية في الكانفاس */
+        .arabic-text, td, th, div, span, p {
+            letter-spacing: 0 !important;
+            word-spacing: 0 !important;
+            font-variant-ligatures: common-ligatures discretionary-ligatures !important;
+            -webkit-font-feature-settings: "kern" 1, "liga" 1, "clig" 1, "calt" 1 !important;
+            font-feature-settings: "kern" 1, "liga" 1, "clig" 1, "calt" 1 !important;
+            text-rendering: optimizeLegibility !important;
         }
     </style>
 
     <div class="report-paper" id="report-content">
         <div class="header-container" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; background-color: white; direction: ltr;">
             <div class="header-left" style="width: 30%; text-align: left; background-color: white;">
-                <img src="logo_header.png" alt="Seha" style="height: 100px; width: auto; border: none; filter: brightness(1.2) contrast(1.2); background-color: transparent;">
+                <img src="logo_header.png" alt="Seha" style="height: 100px; width: auto; border: none;">
             </div>
             <div class="header-center" style="width: 40%; text-align: center; background-color: white;">
-                <img src="report_header_text_new.png" alt="Kingdom of Saudi Arabia" style="width: 100%; height: auto; border: none; background-color: transparent; filter: brightness(1.05);">
+                <img src="report_header_text_new.png" alt="Kingdom of Saudi Arabia" style="width: 100%; height: auto; border: none;">
             </div>
             <div class="header-right" style="width: 30%; background-color: white; text-align: right;">
-                <img src="mesh_header.png.png" alt="Decorative Mesh" style="width: 100%; height: auto; border: none; background-color: transparent;">
+                <img src="mesh_header.png.png" alt="Decorative Mesh" style="width: 100%; height: auto; border: none;">
             </div>
         </div>
 
@@ -472,14 +476,14 @@
             <div class="footer-divider"></div>
             <div class="hospital-col" style="background-color: white; padding: 10px; border-radius: 8px;">
                 <div style="background-color: white; display: inline-block; padding: 5px;">
-                    <img src="moh_logo.png.png" alt="MOH" class="moh-logo" style="height: 100px; width: auto; border: none; background-color: transparent; filter: brightness(1.05);">
+                    <img src="moh_logo.png.png" alt="MOH" class="moh-logo" style="height: 100px; width: auto; border: none;">
                 </div>
                 <div class="hospital-name" style="margin-top: 10px;">
                     <div id="v-hosp-ar" style="font-size: 16px; font-weight: bold; color: var(--navy);"></div>
                     <div id="v-hosp-en" style="font-size: 14px; font-family: 'Inter', sans-serif; color: var(--primary);"></div>
                 </div>
                 <div style="background-color: white; display: inline-block; padding: 5px; margin-top: 10px;">
-                    <img src="nhic_logo_new.png" alt="NHIC" class="nhic-logo-footer" style="border: none; height: 110px; width: auto; background-color: transparent; filter: brightness(1.05);">
+                    <img src="nhic_logo_new.png" alt="NHIC" class="nhic-logo-footer" style="border: none; height: 110px; width: auto;">
                 </div>
             </div>
             <div class="verify-col">
@@ -626,15 +630,29 @@
             });
         }
 
-        async function imgToBase64(url) {
+        async function imgToBase64(url, removeWhite = false) {
             return new Promise((resolve) => {
                 const img = new Image();
                 img.crossOrigin = 'anonymous';
                 img.onload = () => {
                     try {
                         const c = document.createElement('canvas');
-                        c.width = img.naturalWidth; c.height = img.naturalHeight;
-                        c.getContext('2d').drawImage(img, 0, 0);
+                        c.width = img.naturalWidth;
+                        c.height = img.naturalHeight;
+                        const ctx = c.getContext('2d');
+                        ctx.drawImage(img, 0, 0);
+
+                        if (removeWhite) {
+                            const imageData = ctx.getImageData(0, 0, c.width, c.height);
+                            const data = imageData.data;
+                            for (let i = 0; i < data.length; i += 4) {
+                                // إذا كان اللون قريباً جداً من الأبيض (أكبر من 250 في كل القنوات)
+                                if (data[i] > 250 && data[i + 1] > 250 && data[i + 2] > 250) {
+                                    data[i + 3] = 0; // جعل البكسل شفافاً
+                                }
+                            }
+                            ctx.putImageData(imageData, 0, 0);
+                        }
                         resolve(c.toDataURL('image/png'));
                     } catch (e) { resolve(url); }
                 };
@@ -643,31 +661,39 @@
             });
         }
 
-        async function generatePDF(isDownload = true) {
+        async function generatePDF(target = 'download') {
             const element = document.getElementById('report-content');
             const overlay = document.getElementById('loading-overlay');
             const originalMsg = document.getElementById('loading-msg').innerText;
-            const btns = document.querySelectorAll('.print-btn, .share-btn');
+            const btns = document.querySelectorAll('.print-controls button');
 
             try {
                 btns.forEach(b => b.disabled = true);
                 overlay.style.display = 'flex';
-                document.getElementById('loading-msg').innerText = 'جاري تحضير التقرير بأعلى دقة...';
+                document.getElementById('loading-msg').innerText = 'جاري المعالجة الفائقة للدقة ومنع تقطع الأحرف...';
+
+                await document.fonts.ready;
 
                 const imgs = element.querySelectorAll('img');
                 const originalSrcs = [];
                 for (const img of imgs) {
                     originalSrcs.push(img.src);
-                    img.src = await imgToBase64(img.src);
+                    // تنظيف خلفية الشعارات فقط (التي ليست باركود)
+                    const isLogo = img.id !== 'qr-code-img';
+                    img.src = await imgToBase64(img.src, isLogo);
                 }
-                await new Promise(r => setTimeout(r, 600));
+                await new Promise(r => setTimeout(r, 1000));
 
                 const canvas = await html2canvas(element, {
-                    scale: 3.5,
+                    scale: 5,
                     useCORS: true,
                     logging: false,
                     backgroundColor: '#ffffff',
-                    windowWidth: 794
+                    windowWidth: 794,
+                    letterRendering: false,
+                    onclone: (clonedDoc) => {
+                        clonedDoc.getElementById('report-content').style.boxShadow = 'none';
+                    }
                 });
 
                 const imgData = canvas.toDataURL('image/jpeg', 1.0);
@@ -676,10 +702,10 @@
                 const pdfWidth = pdf.internal.pageSize.getWidth();
                 const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
                 
-                pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight, undefined, 'FAST');
+                pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight, undefined, 'SLOW');
                 const fileName = `Sick_Leave_${leaveId || 'Report'}.pdf`;
 
-                if (isDownload) {
+                if (target === 'download') {
                     pdf.save(fileName);
                 } else {
                     const pdfBlob = pdf.output('blob');
@@ -692,7 +718,7 @@
                         });
                     } else {
                         pdf.save(fileName);
-                        alert('تم تنزيل الملف، ميزة المشاركة غير مدعومة في متصفحك.');
+                        alert('تم تنزيل الملف، متصفحك لا يدعم المشاركة المباشرة.');
                     }
                 }
                 imgs.forEach((img, i) => { img.src = originalSrcs[i]; });
@@ -706,8 +732,9 @@
             }
         }
 
-        function downloadPDF() { generatePDF(true); }
-        function sharePDF() { generatePDF(false); }
+        function downloadPDF() { generatePDF('download'); }
+        function sharePDF() { generatePDF('share'); }
+        function shareWhatsApp() { generatePDF('share'); }
     </script>
 </body>
 </html>
