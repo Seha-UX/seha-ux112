@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>صحة - منصة الخدمات الصحية</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <!-- html2canvas لتحويل الصفحة إلى صورة لإصلاح مشكلة الأحرف العربية -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <!-- jsPDF لإنشاء ملف PDF من الصورة -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <!-- html2pdf كاحتياطي -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        :root {
+            --primary: #306db5;
+            --navy: #123469;
+            --border: #d1d1d1;
+            --bg-label: #fdfdfd;
+            --text-value: #1a3a63;
+        }
+
+        .arabic-text {
+            display: inline-block;
+            direction: rtl;
+            unicode-bidi: isolate;
+            white-space: nowrap;
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        body {
+            font-family: 'Cairo', 'Inter', sans-serif;
+            background: #f0f2f5;
+            margin: 0;
+            padding: 20px;
+            direction: rtl;
+        }
+
+        .report-paper {
+            width: 210mm;
+            margin: 0 auto;
+            background: #fff;
+            padding: 5mm 8mm;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            position: relative;
+            display: block;
+        }
+
+        .header-img {
+            width: 100%;
+            margin-bottom: 14px;
+        }
+
+        .header-img img {
+            width: 100%;
+            height: auto;
+            image-rendering: -webkit-optimize-contrast;
+            image-rendering: high-quality;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            table-layout: fixed;
+            margin-bottom: 14px;
+            border: 1.2px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        th, td {
+            border: 0.5px solid var(--border);
+            padding: 6px 5px;
+            font-size: 11.5px;
+            vertical-align: middle;
+            line-height: 1.4;
+            text-align: center;
+            word-wrap: break-word;
+            font-family: 'Cairo', sans-serif;
+            text-rendering: optimizeLegibility;
+        }
+
+        .label-ar {
+            width: 16%;
+            color: var(--primary);
+            font-weight: 800;
+            background: var(--bg-label);
+            font-size: 10.5px;
+        }
+
+        .label-en {
+            width: 16%;
+            color: var(--primary);
+            font-weight: 700;
+            background: var(--bg-label);
+            font-family: 'Inter', sans-serif;
+            text-transform: uppercase;
+            direction: ltr;
+            font-size: 10px;
+        }
+
+        .value-ar {
+            font-weight: 500;
+            color: var(--text-value);
+            font-size: 11px;
+        }
+
+        .value-en {
+            font-weight: 500;
+            color: var(--text-value);
+            font-family: 'Inter', sans-serif;
+            text-transform: uppercase;
+            direction: ltr;
+            font-size: 11px;
+        }
+
+        .value-center {
+            font-weight: 500;
+            color: var(--text-value);
+            text-transform: uppercase;
+            font-size: 11px;
+        }
+
+        .value-center-blue {
+            font-weight: 500;
+            color: var(--text-value);
+            text-transform: uppercase;
+            font-size: 11px;
+        }
+
+        .highlight-row th,
+        .highlight-row td {
+            background-color: var(--navy) !important;
+            color: white !important;
+            border-color: var(--navy);
+            padding: 8px 3px;
+        }
+
+        .highlight-row .label-ar,
+        .highlight-row .label-en {
+            color: white !important;
+        }
+
+        .highlight-row .value-ar,
+        .highlight-row .value-en {
+            color: white !important;
+            font-weight: 600;
+            font-size: 10.5px;
+        }
+
+        .footer-section {
+            margin-top: 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 8px;
+            position: relative;
+            min-height: 120px;
+        }
+
+        .footer-divider {
+            position: absolute;
+            left: 50%;
+            top: 10px;
+            bottom: 10px;
+            width: 1px;
+            background: #d1d1d1;
+        }
+
+        .verify-col {
+            width: 48%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .verify-text {
+            font-size: 11px;
+            color: #000;
+            line-height: 1.6;
+            font-weight: 800;
+            text-align: center;
+            margin-bottom: 10px;
+            margin-top: 0px;
+        }
+
+        .verify-link {
+            color: #0000ee;
+            text-decoration: none;
+            border-bottom: 1px solid #0000ee;
+            font-size: 10.5px;
+            font-weight: bold;
+            display: inline-block;
+            margin-top: 5px;
+        }
+
+        .timestamp {
+            width: 100%;
+            margin-top: 15px;
+            font-size: 13px;
+            color: #111;
+            font-weight: 800;
+            text-align: left;
+            direction: ltr;
+            font-family: 'Times New Roman', Times, serif;
+        }
+
+        #p-time {
+            margin-bottom: 4px;
+            font-size: 14px;
+        }
+
+        #p-date {
+            font-size: 14px;
+        }
+
+        .hospital-col {
+            width: 48%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .moh-logo {
+            width: 200px;
+            height: auto;
+            margin-bottom: 8px;
+        }
+
+        .hospital-name {
+            font-size: 13.5px;
+            color: #1a3a63;
+            line-height: 1.4;
+            font-weight: 900;
+            text-align: center;
+        }
+
+        .nhic-logo-footer {
+            width: 180px;
+            height: auto;
+            margin-top: 8px;
+        }
+
+        .print-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 700;
+            z-index: 1000;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            text-transform: uppercase;
+        }
+
+        #loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #fff;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--primary);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+
+            .report-paper {
+                margin: 0;
+                box-shadow: none;
+                width: 210mm;
+                min-height: 297mm;
+                padding: 10mm 12mm;
+            }
+
+            .print-btn,
+            #loading-overlay {
+                display: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="loading-overlay">
+        <div class="spinner"></div>
+        <div id="loading-msg" style="margin-top:15px; font-weight:bold; color:var(--primary);">جاري التوسيع الأقصى
+            للخلايا...</div>
+    </div>
+
+    <button class="print-btn" onclick="downloadPDF()">PRINT REPORT</button>
+
+    <div class="report-paper" id="report-content">
+        <div class="header-container" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; background-color: white; direction: ltr;">
+            <div class="header-left" style="width: 30%; text-align: left; background-color: white;">
+                <img src="logo_header.png" alt="Seha" style="height: 100px; width: auto; border: none; mix-blend-mode: multiply; filter: brightness(1.1) contrast(1.2); background-color: white;">
+            </div>
+            <div class="header-center" style="width: 40%; text-align: center; background-color: white;">
+                <img src="report_header_text_new.png" alt="Kingdom of Saudi Arabia" style="width: 100%; height: auto; border: none; background-color: white;">
+            </div>
+            <div class="header-right" style="width: 30%; background-color: white; text-align: right;">
+                <img src="mesh_header.png.png" alt="Decorative Mesh" style="width: 100%; height: auto; border: none; background-color: white;">
+            </div>
+        </div>
+
+        <table id="data-table">
+            <tr>
+                <th class="label-ar" style="border-top-right-radius: 12px;">رمز الإجازة</th>
+                <td colspan="2" class="value-center-blue" id="v-id">--</td>
+                <th class="label-en" style="border-top-left-radius: 12px;">Leave ID</th>
+            </tr>
+            <tr class="highlight-row">
+                <th class="label-ar">مدة الإجازة</th>
+                <td class="value-ar" id="v-dur-ar">--</td>
+                <td class="value-en" id="v-dur-en">--</td>
+                <th class="label-en">Leave Duration</th>
+            </tr>
+            <tr>
+                <th class="label-ar">تاريخ الدخول</th>
+                <td class="value-ar" id="v-adm-ar">--</td>
+                <td class="value-en" id="v-adm-en">--</td>
+                <th class="label-en">Admission Date</th>
+            </tr>
+            <tr>
+                <th class="label-ar">تاريخ الخروج</th>
+                <td class="value-ar" id="v-dis-ar">--</td>
+                <td class="value-en" id="v-dis-en">--</td>
+                <th class="label-en">Discharge Date</th>
+            </tr>
+            <tr>
+                <th class="label-ar">تاريخ إصدار التقرير</th>
+                <td colspan="2" class="value-center" id="v-iss">--</td>
+                <th class="label-en">Issue Date</th>
+            </tr>
+            <tr>
+                <th class="label-ar">الاسم</th>
+                <td class="value-ar" id="v-name-ar">--</td>
+                <td class="value-en" id="v-name-en">--</td>
+                <th class="label-en">Name</th>
+            </tr>
+            <tr>
+                <th class="label-ar">رقم الهوية / الإقامة</th>
+                <td colspan="2" class="value-center-blue" id="v-nid">--</td>
+                <th class="label-en">National ID / Iqama</th>
+            </tr>
+            <tr>
+                <th class="label-ar">الجنسية</th>
+                <td class="value-ar" id="v-nat-ar">--</td>
+                <td class="value-en" id="v-nat-en">--</td>
+                <th class="label-en">Nationality</th>
+            </tr>
+            <tr>
+                <th class="label-ar">جهة العمل</th>
+                <td colspan="2" class="value-center" id="v-emp">--</td>
+                <th class="label-en">Employer</th>
+            </tr>
+            <tr>
+                <th class="label-ar">اسم الممارس</th>
+                <td class="value-ar" id="v-pra-ar">--</td>
+                <td class="value-en" id="v-pra-en">--</td>
+                <th class="label-en">Practitioner Name</th>
+            </tr>
+            <tr>
+                <th class="label-ar" style="border-bottom-right-radius: 12px;">المسمى الوظيفي</th>
+                <td class="value-ar" id="v-pos-ar">--</td>
+                <td class="value-en" id="v-pos-en">--</td>
+                <th class="label-en" style="border-bottom-left-radius: 12px;">Position</th>
+            </tr>
+        </table>
+
+        <div class="footer-section">
+            <div class="footer-divider"></div>
+            <div class="hospital-col" style="background-color: white; padding: 10px; border-radius: 8px;">
+                <div style="background-color: white; display: inline-block; padding: 5px;">
+                    <img src="moh_logo.png.png" alt="MOH" class="moh-logo" style="height: 100px; width: auto; border: none; background-color: white;">
+                </div>
+                <div class="hospital-name" style="margin-top: 10px;">
+                    <div id="v-hosp-ar" style="font-size: 16px; font-weight: bold; color: var(--navy);"></div>
+                    <div id="v-hosp-en" style="font-size: 14px; font-family: 'Inter', sans-serif; color: var(--primary);"></div>
+                </div>
+                <div style="background-color: white; display: inline-block; padding: 5px; margin-top: 10px;">
+                    <img src="nhic_logo_new.png" alt="NHIC" class="nhic-logo-footer" style="border: none; height: 110px; width: auto; background-color: white;">
+                </div>
+            </div>
+            <div class="verify-col">
+                <img id="qr-code-img"
+                    src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://seha-ux.github.io/seha-ux/"
+                    alt="QR Code" style="width: 110px; height: 110px; margin-top: 10px; margin-bottom: 12px;">
+                <div class="verify-text">
+
+
+                    للتحقق من بيانات التقرير يرجى التأكد من زيارة موقع منصة صحة الرسمي<br>
+                    <span style="font-family: 'Inter', sans-serif; font-size: 10px;">To check the report please visit
+                        Seha's offical website</span><br>
+                    <a href="https://seha-ux.github.io/seha-ux/" class="verify-link">seha-ux.github.io/seha-ux/</a>
+                </div>
+                <div class="timestamp">
+                    <div id="p-time">--</div>
+                    <div id="p-date">--</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwKhcyjYfvibFJJXzy0hxT6CnmmL5gbBZYI5gBnTrmvy_6gvNNUjnlK-qXTzWsyGly9SA/exec';
+        const urlParams = new URLSearchParams(window.location.search);
+        const leaveId = urlParams.get('id');
+
+        function gregorianToHijri(d) {
+            if (!d || isNaN(d.getTime())) return "--";
+            let day = d.getDate(), month = d.getMonth() + 1, year = d.getFullYear();
+            let jd = Math.floor((1461 * (year + 4800 + Math.floor((month - 14) / 12))) / 4) + Math.floor((367 * (month - 2 - 12 * (Math.floor((month - 14) / 12)))) / 12) - Math.floor((3 * (Math.floor((year + 4900 + Math.floor((month - 14) / 12)) / 100))) / 4) + day - 32075;
+            let l = jd - 1948440 + 10632, n = Math.floor((l - 1) / 10631);
+            l = l - 10631 * n + 354;
+            let j = (Math.floor((10985 - l) / 5316)) * (Math.floor((50 * l) / 17719)) + (Math.floor(l / 5670)) * (Math.floor((43 * l) / 15238));
+            l = l - (Math.floor((30 - j) / 15)) * (Math.floor((17719 * j) / 50)) - (Math.floor(j / 16)) * (Math.floor((15238 * j) / 43)) + 29;
+            month = Math.floor((24 * l) / 709); day = l - Math.floor((709 * month) / 24); year = 30 * n + j - 30;
+            return `${String(day).padStart(2, '0')}-${String(month).padStart(2, '0')}-${year}`;
+        }
+
+        function parseSmartDate(dateStr) {
+            if (!dateStr || dateStr === "--") return null;
+            let d = new Date(dateStr);
+            if (isNaN(d.getTime())) {
+                const parts = dateStr.split('-');
+                if (parts.length === 3) {
+                    if (parts[0].length === 4) d = new Date(dateStr);
+                    else d = new Date(`${parts[2]}-${parts[1]}-${parts[0]}`);
+                }
+            }
+            return isNaN(d.getTime()) ? null : d;
+        }
+
+        function toGregorian(dateStr) {
+            const d = parseSmartDate(dateStr);
+            if (!d) return "--";
+            return `${String(d.getDate()).padStart(2, '0')}-${String(d.getMonth() + 1).padStart(2, '0')}-${d.getFullYear()}`;
+        }
+
+        function processData(data) {
+            document.getElementById('v-id').innerText = data.leaveId;
+            const admD = parseSmartDate(data.admissionDate), disD = parseSmartDate(data.dischargeDate);
+            const admG = toGregorian(data.admissionDate), disG = toGregorian(data.dischargeDate), issG = toGregorian(data.issueDate);
+            const admH = gregorianToHijri(admD), disH = gregorianToHijri(disD);
+
+            document.getElementById('v-adm-en').innerText = admG;
+            document.getElementById('v-adm-ar').innerText = admH;
+            document.getElementById('v-dis-en').innerText = disG;
+            document.getElementById('v-dis-ar').innerText = disH;
+            document.getElementById('v-iss').innerText = issG;
+
+            const durParts = (data.duration || "").split(' / ');
+            const durArRaw = durParts[0] || "";
+            let durEnCount = durParts[1] || "";
+
+            if (!durEnCount) {
+                const match = durArRaw.match(/\d+/);
+                if (match) {
+                    const num = match[0];
+                    durEnCount = `${num} day${num > 1 ? 's' : ''}`;
+                } else {
+                    const diff = Math.ceil(Math.abs(disD - admD) / (1000 * 60 * 60 * 24)) + 1;
+                    durEnCount = `${diff} days`;
+                }
+            }
+
+            document.getElementById('v-dur-en').innerText = durEnCount + " (" + admG + " TO " + disG + ")";
+            document.getElementById('v-dur-ar').innerText = durArRaw + " (" + admH + " إلى " + disH + ")";
+
+            const fields = ['patientName', 'nationalId', 'nationality', 'employer', 'practitionerName', 'position', 'hospitalName'];
+            const ids = ['v-name', 'v-nid', 'v-nat', 'v-emp', 'v-pra', 'v-pos', 'v-hosp'];
+            
+            fields.forEach((field, index) => {
+                let val = data[field];
+                
+                // حماية قصوى لمنع ظهور التاريخ في خانة المستشفى
+                const isTimestamp = (v) => v && v.includes('T') && v.includes('Z') && v.includes(':');
+                
+                if (!val || val === "-- / --" || val.trim() === "/" || val.trim() === "--" || (field === 'hospitalName' && isTimestamp(val))) {
+                    if (field === 'hospitalName') {
+                        val = "مستشفى الرياض التخصصي / Riyadh Specialized Hospital";
+                    } else {
+                        val = "-- / --";
+                    }
+                }
+                
+                const parts = val.split(' / ');
+                const arVal = parts[0] ? parts[0].trim() : "--";
+                const enVal = parts[1] ? parts[1].trim() : "--";
+
+                if (field === 'hospitalName') {
+                    document.getElementById('v-hosp-ar').innerHTML = `<span class="arabic-text">${arVal}</span>`;
+                    document.getElementById('v-hosp-en').innerText = enVal;
+                } else {
+                    const baseId = ids[index];
+                    const arEl = document.getElementById(baseId + '-ar');
+                    const enEl = document.getElementById(baseId + '-en');
+                    const centerEl = document.getElementById(baseId);
+
+                    if (arEl) arEl.innerHTML = `<span class="arabic-text">${arVal}</span>`;
+                    if (enEl) enEl.innerText = enVal;
+                    if (centerEl && !arEl) centerEl.innerHTML = `<span class="arabic-text">${arVal}</span>`;
+                }
+            });
+
+            document.getElementById('v-nid').innerText = data.nationalId;
+            const now = new Date(data.createdAt || Date.now());
+
+            let hours = now.getHours();
+            let mins = now.getMinutes();
+            let ampm = hours >= 12 ? 'PM' : 'AM';
+            hours = hours % 12;
+            hours = hours ? hours : 12;
+            mins = mins < 10 ? '0' + mins : mins;
+            document.getElementById('p-time').innerText = `${hours}:${mins} ${ampm}`;
+
+            const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+            const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+            document.getElementById('p-date').innerText = `${days[now.getDay()]}, ${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}`;
+
+            // تحديث رابط الـ QR Code ليكون ديناميكياً بناءً على الصفحة الحالية
+            const currentUrl = window.location.href;
+            document.getElementById('qr-code-img').src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(currentUrl)}`;
+
+            document.getElementById('loading-overlay').style.display = 'none';
+        }
+
+        if (leaveId) {
+            const finalUrl = `${SCRIPT_URL}?leaveId=${encodeURIComponent(leaveId)}`;
+            
+            fetch(finalUrl, {
+                method: 'GET',
+                redirect: 'follow', // مهم جداً لجوجل سكريبت
+            })
+            .then(async res => {
+                if (!res.ok) throw new Error('Network response was not ok');
+                const data = await res.json();
+                if (data && data.leaveId) { 
+                    document.getElementById('loading-overlay').style.display = 'none'; 
+                    processData(data); 
+                } else { 
+                    document.getElementById('loading-msg').innerText = "خطأ: لم يتم العثور على بيانات لهذا الرقم في قاعدة البيانات."; 
+                }
+            })
+            .catch(err => { 
+                console.error('Detailed fetch error:', err);
+                let errorMsg = "خطأ: لم يتم العثور على بيانات لهذا الرقم في قاعدة البيانات.";
+                if (err.toString().includes('TypeError')) {
+                    errorMsg = "خطأ في الاتصال بالخادم. يرجى التأكد من نشر السكريبت كـ Web App.";
+                }
+                document.getElementById('loading-msg').innerHTML = errorMsg; 
+            });
+        }
+
+        // تحويل صورة URL إلى base64 لتجنب مشاكل CORS
+        async function imgToBase64(url) {
+            return new Promise((resolve) => {
+                const img = new Image();
+                img.crossOrigin = 'anonymous';
+                img.onload = () => {
+                    try {
+                        const c = document.createElement('canvas');
+                        c.width = img.naturalWidth; c.height = img.naturalHeight;
+                        c.getContext('2d').drawImage(img, 0, 0);
+                        resolve(c.toDataURL('image/png'));
+                    } catch (e) { resolve(url); }
+                };
+                img.onerror = () => resolve(url);
+                img.src = url + (url.includes('?') ? '&' : '?') + '_t=' + Date.now();
+            });
+        }
+
+        async function downloadPDF() {
+            const element = document.getElementById('report-content');
+            const btn     = document.querySelector('.print-btn');
+            const overlay = document.getElementById('loading-overlay');
+
+            btn.disabled = true;
+            btn.textContent = 'جاري التصدير بأعلى دقة...';
+
+            // ── حفظ الحالة الأصلية للصور وتحويلها لـ base64 ──
+            const allImgs  = element.querySelectorAll('img');
+            const origSrcs = [];
+            
+            try {
+                // تحويل الصور لضمان عدم حدوث مشاكل في التحميل أثناء التصدير
+                for (const img of allImgs) {
+                    origSrcs.push(img.src);
+                    img.src = await imgToBase64(img.src);
+                }
+
+                const opt = {
+                    margin:       0,
+                    filename:     `Sick_Leave_${leaveId || 'report'}.pdf`,
+                    image:        { type: 'jpeg', quality: 1 }, 
+                    html2canvas:  { 
+                        scale: 4, 
+                        useCORS: true, 
+                        letterRendering: false,
+                        backgroundColor: '#ffffff',
+                        logging: false,
+                        scrollY: 0,
+                        windowWidth: 1200 // عرض ثابت لضمان عدم تكسر النصوص
+                    },
+                    jsPDF:        { 
+                        unit: 'mm', 
+                        format: 'a4', 
+                        orientation: 'portrait',
+                        precision: 32,
+                        compress: true
+                    },
+                    pagebreak: { mode: 'avoid-all' }
+                };
+
+                await html2pdf().set(opt).from(element).save();
+
+                // استعادة الصور الأصلية
+                allImgs.forEach((img, i) => { img.src = origSrcs[i]; });
+
+            } catch (err) {
+                console.error('PDF export error:', err);
+                // استعادة الصور في حال الخطأ
+                allImgs.forEach((img, i) => { if (origSrcs[i]) img.src = origSrcs[i]; });
+                window.print();
+            } finally {
+                btn.disabled      = false;
+                btn.textContent   = 'PRINT REPORT';
+                overlay.style.display = 'none';
+            }
+        }
+    </script>
+
+</body>
+
+</html>
