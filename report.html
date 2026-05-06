@@ -26,8 +26,9 @@
         .arabic-text {
             display: inline-block;
             direction: rtl;
-            unicode-bidi: isolate;
+            unicode-bidi: plaintext;
             white-space: nowrap;
+            text-align: right;
         }
 
         * {
@@ -640,13 +641,13 @@
                     filename:     `Sick_Leave_${leaveId || 'report'}.pdf`,
                     image:        { type: 'jpeg', quality: 1 }, 
                     html2canvas:  { 
-                        scale: 4, 
+                        scale: 3, 
                         useCORS: true, 
                         letterRendering: false,
                         backgroundColor: '#ffffff',
                         logging: false,
                         scrollY: 0,
-                        windowWidth: 1200 // عرض ثابت لضمان عدم تكسر النصوص
+                        windowWidth: 800 // العرض المثالي للورقة A4 لمنع التمدد وعكس النصوص
                     },
                     jsPDF:        { 
                         unit: 'mm', 
