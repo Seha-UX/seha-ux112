@@ -78,7 +78,8 @@
             overflow: hidden;
         }
 
-        th, td {
+        th,
+        td {
             border: 0.5px solid var(--border);
             padding: 6px 5px;
             font-size: 11.5px;
@@ -162,10 +163,9 @@
             margin-top: 18px;
             display: flex;
             justify-content: space-between;
-            align-items: center;
+            align-items: flex-start;
             padding-top: 8px;
             position: relative;
-            min-height: 120px;
         }
 
         .footer-divider {
@@ -182,7 +182,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
+            justify-content: flex-start;
             padding-left: 20px;
             position: relative;
         }
@@ -232,18 +232,19 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
+            justify-content: flex-start;
+            gap: 0;
         }
 
         .moh-logo {
             width: 340px;
             height: auto;
-            margin-bottom: 0px;
+            margin-bottom: -20px;
         }
 
         .hospital-name {
             font-size: 13.5px;
-            color: #1a3a63;
+            color: #000;
             line-height: 1.4;
             font-weight: 900;
             text-align: center;
@@ -330,7 +331,8 @@
 
     <div id="loading-overlay">
         <div class="spinner"></div>
-        <div id="loading-msg" style="margin-top:15px; font-weight:bold; color:var(--primary);">جاري تحميل البيانات...</div>
+        <div id="loading-msg" style="margin-top:15px; font-weight:bold; color:var(--primary);">جاري تحميل البيانات...
+        </div>
     </div>
 
     <div class="print-controls">
@@ -352,19 +354,21 @@
             left: 50%;
             transform: translateX(-50%);
             display: flex;
-            gap: 15px;
+            gap: 20px;
             z-index: 1000;
-            background: rgba(255, 255, 255, 0.85);
+            background: rgba(255, 255, 255, 0.95);
             padding: 12px 25px;
             border-radius: 100px;
             backdrop-filter: blur(10px);
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
             border: 1px solid rgba(255, 255, 255, 0.3);
-            width: fit-content;
+            width: max-content;
             max-width: 95vw;
         }
 
-        .print-btn, .share-btn, .whatsapp-btn {
+        .print-btn,
+        .share-btn,
+        .whatsapp-btn {
             color: white;
             border: none;
             padding: 12px 24px;
@@ -374,28 +378,45 @@
             font-family: 'Cairo', sans-serif;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             font-size: 14px;
+            flex-shrink: 0;
             display: flex;
             align-items: center;
             gap: 8px;
             white-space: nowrap;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
         }
 
-        .icon { font-size: 16px; }
+        .icon {
+            font-size: 16px;
+        }
 
-        .print-btn { background: #123469; }
-        .share-btn { background: #306db5; }
-        .whatsapp-btn { background: #25d366; }
+        .print-btn {
+            background: #123469;
+        }
 
-        .print-btn:hover, .share-btn:hover, .whatsapp-btn:hover {
+        .share-btn {
+            background: #306db5;
+        }
+
+        .whatsapp-btn {
+            background: #25d366;
+        }
+
+        .print-btn:hover,
+        .share-btn:hover,
+        .whatsapp-btn:hover {
             transform: translateY(-3px) scale(1.02);
             filter: brightness(1.1);
             box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
         }
 
-        .print-btn:active { transform: translateY(-1px); }
+        .print-btn:active {
+            transform: translateY(-1px);
+        }
 
-        .print-btn:disabled, .share-btn:disabled, .whatsapp-btn:disabled {
+        .print-btn:disabled,
+        .share-btn:disabled,
+        .whatsapp-btn:disabled {
             background: #a0a0a0;
             cursor: not-allowed;
             transform: none;
@@ -408,18 +429,28 @@
                 padding: 10px 15px;
                 gap: 8px;
             }
-            .print-btn, .share-btn, .whatsapp-btn {
+
+            .print-btn,
+            .share-btn,
+            .whatsapp-btn {
                 padding: 10px 15px;
                 font-size: 12px;
             }
         }
 
         @media print {
-            .print-controls { display: none; }
+            .print-controls {
+                display: none;
+            }
         }
 
         /* إصلاح تقطع الأحرف العربية في الكانفاس */
-        .arabic-text, td, th, div, span, p {
+        .arabic-text,
+        td,
+        th,
+        div,
+        span,
+        p {
             letter-spacing: 0 !important;
             word-spacing: 0 !important;
             font-variant-ligatures: common-ligatures discretionary-ligatures !important;
@@ -430,12 +461,14 @@
     </style>
 
     <div class="report-paper" id="report-content">
-        <div class="header-container" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; background-color: white; direction: ltr;">
+        <div class="header-container"
+            style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; background-color: white; direction: ltr;">
             <div class="header-left" style="width: 30%; text-align: left; background-color: white;">
                 <img src="logo_header.png" alt="Seha" style="height: 100px; width: auto; border: none;">
             </div>
             <div class="header-center" style="width: 40%; text-align: center; background-color: white;">
-                <img src="report_header_text_new.png" alt="Kingdom of Saudi Arabia" style="width: 100%; height: auto; border: none;">
+                <img src="report_header_text_new.png" alt="Kingdom of Saudi Arabia"
+                    style="width: 100%; height: auto; border: none;">
             </div>
             <div class="header-right" style="width: 30%; background-color: white; text-align: right;">
                 <img src="mesh_header.png.png" alt="Decorative Mesh" style="width: 100%; height: auto; border: none;">
@@ -511,23 +544,27 @@
             <div class="footer-divider"></div>
             <div class="hospital-col" style="background-color: white; padding: 10px; border-radius: 8px;">
                 <div style="background-color: white; display: inline-block; padding: 0px;">
-                    <img src="moh_logo.png.png" alt="MOH" class="moh-logo" style="height: 180px; width: auto; border: none;">
+                    <img src="moh_logo.png.png" alt="MOH" class="moh-logo"
+                        style="height: 180px; width: auto; border: none;">
                 </div>
-                <div class="hospital-name" style="margin-top: 0px;">
-                    <div id="v-hosp-ar" style="font-size: 16px; font-weight: bold; color: var(--navy);"></div>
-                    <div id="v-hosp-en" style="font-size: 14px; font-family: 'Inter', sans-serif; color: var(--primary);"></div>
+                <div class="hospital-name" style="margin-top: 10px;">
+                    <div id="v-hosp-ar" style="font-size: 16px; font-weight: bold; color: #000;"></div>
+                    <div id="v-hosp-en"
+                        style="font-size: 14px; font-family: 'Inter', sans-serif; color: var(--primary);"></div>
                 </div>
                 <div style="background-color: white; display: inline-block; padding: 5px; margin-top: 10px;">
-                    <img src="nhic_logo_new.png" alt="NHIC" class="nhic-logo-footer" style="border: none; height: 150px; width: auto;">
+                    <img src="nhic_logo_new.png" alt="NHIC" class="nhic-logo-footer"
+                        style="border: none; height: 150px; width: auto; margin-left: 10px;">
                 </div>
             </div>
             <div class="verify-col">
                 <img id="qr-code-img"
                     src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://seha-ux.github.io/seha-ux/"
-                    alt="QR Code" style="width: 110px; height: 110px; margin-top: 10px; margin-bottom: 12px;">
+                    alt="QR Code" style="width: 110px; height: 110px; margin-top: 0px; margin-bottom: 12px;">
                 <div class="verify-text">
                     للتحقق من بيانات التقرير يرجى التأكد من زيارة موقع منصة صحة الرسمي<br>
-                    <span style="font-family: 'Inter', sans-serif; font-size: 10px;">To check the report please visit Seha's official website</span><br>
+                    <span style="font-family: 'Inter', sans-serif; font-size: 10px;">To check the report please visit
+                        Seha's official website</span><br>
                     <a href="https://seha-ux.github.io/seha-ux/" class="verify-link">seha-ux.github.io/seha-ux/</a>
                 </div>
                 <div class="timestamp">
@@ -606,7 +643,7 @@
 
             const fields = ['patientName', 'nationalId', 'nationality', 'employer', 'practitionerName', 'position', 'hospitalName'];
             const ids = ['v-name', 'v-nid', 'v-nat', 'v-emp', 'v-pra', 'v-pos', 'v-hosp'];
-            
+
             fields.forEach((field, index) => {
                 let val = data[field];
                 const isTimestamp = (v) => v && v.includes('T') && v.includes('Z') && v.includes(':');
@@ -651,18 +688,18 @@
         if (leaveId) {
             const finalUrl = `${SCRIPT_URL}?leaveId=${encodeURIComponent(leaveId)}`;
             fetch(finalUrl, { method: 'GET', redirect: 'follow' })
-            .then(async res => {
-                const data = await res.json();
-                if (data && data.leaveId) { 
-                    document.getElementById('loading-overlay').style.display = 'none'; 
-                    processData(data); 
-                } else { 
-                    document.getElementById('loading-msg').innerText = "خطأ: لم يتم العثور على بيانات لهذا الرقم."; 
-                }
-            })
-            .catch(err => { 
-                document.getElementById('loading-msg').innerText = "خطأ في الاتصال بالقاعدة."; 
-            });
+                .then(async res => {
+                    const data = await res.json();
+                    if (data && data.leaveId) {
+                        document.getElementById('loading-overlay').style.display = 'none';
+                        processData(data);
+                    } else {
+                        document.getElementById('loading-msg').innerText = "خطأ: لم يتم العثور على بيانات لهذا الرقم.";
+                    }
+                })
+                .catch(err => {
+                    document.getElementById('loading-msg').innerText = "خطأ في الاتصال بالقاعدة.";
+                });
         }
 
         async function imgToBase64(url, removeWhite = false) {
@@ -683,7 +720,7 @@
                             for (let i = 0; i < data.length; i += 4) {
                                 // تنظيف أكثر حزماً للأبيض المائل للرمادي
                                 if (data[i] > 235 && data[i + 1] > 235 && data[i + 2] > 235) {
-                                    data[i + 3] = 0; 
+                                    data[i + 3] = 0;
                                 }
                             }
                             ctx.putImageData(imageData, 0, 0);
@@ -733,12 +770,12 @@
                 });
 
                 // استخدام JPEG بجودة عالية جداً لتقليل حجم الملف مع الحفاظ على صفاء النصوص
-                const imgData = canvas.toDataURL('image/jpeg', 0.95); 
+                const imgData = canvas.toDataURL('image/jpeg', 0.95);
                 const { jsPDF } = window.jspdf;
                 const pdf = new jsPDF('p', 'mm', 'a4');
                 const pdfWidth = pdf.internal.pageSize.getWidth();
                 const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-                
+
                 pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight, undefined, 'FAST');
                 const fileName = `Sick_Leave_${leaveId || 'Report'}.pdf`;
 
@@ -774,4 +811,5 @@
         function shareWhatsApp() { generatePDF('share'); }
     </script>
 </body>
+
 </html>
