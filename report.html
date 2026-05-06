@@ -236,7 +236,7 @@
         }
 
         .moh-logo {
-            width: 200px;
+            width: 280px;
             height: auto;
             margin-bottom: 8px;
         }
@@ -250,7 +250,7 @@
         }
 
         .nhic-logo-footer {
-            width: 180px;
+            width: 260px;
             height: auto;
             margin-top: 8px;
         }
@@ -334,49 +334,84 @@
     </div>
 
     <div class="print-controls">
-        <button class="print-btn" onclick="downloadPDF()">تنزيل PDF</button>
-        <button class="share-btn" onclick="sharePDF()">مشاركة عامة</button>
-        <button class="whatsapp-btn" onclick="shareWhatsApp()">واتساب PDF</button>
+        <button class="print-btn" onclick="downloadPDF()">
+            <span class="icon">⬇</span> تنزيل PDF
+        </button>
+        <button class="share-btn" onclick="sharePDF()">
+            <span class="icon">🔗</span> مشاركة عامة
+        </button>
+        <button class="whatsapp-btn" onclick="shareWhatsApp()">
+            <span class="icon">💬</span> واتساب
+        </button>
     </div>
 
     <style>
         .print-controls {
             position: fixed;
-            top: 20px;
-            right: 20px;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
             display: flex;
-            gap: 10px;
+            gap: 15px;
             z-index: 1000;
+            background: rgba(255, 255, 255, 0.85);
+            padding: 12px 25px;
+            border-radius: 100px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            width: fit-content;
+            max-width: 95vw;
         }
 
         .print-btn, .share-btn, .whatsapp-btn {
-            background: var(--primary);
             color: white;
             border: none;
-            padding: 10px 20px;
+            padding: 12px 24px;
             border-radius: 50px;
             cursor: pointer;
-            font-weight: 700;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            font-weight: 800;
             font-family: 'Cairo', sans-serif;
-            transition: all 0.3s ease;
-            font-size: 13px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-size: 14px;
             display: flex;
             align-items: center;
             gap: 8px;
+            white-space: nowrap;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
         }
 
+        .icon { font-size: 16px; }
+
+        .print-btn { background: #123469; }
         .share-btn { background: #306db5; }
         .whatsapp-btn { background: #25d366; }
 
         .print-btn:hover, .share-btn:hover, .whatsapp-btn:hover {
-            transform: translateY(-2px);
+            transform: translateY(-3px) scale(1.02);
             filter: brightness(1.1);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
         }
 
+        .print-btn:active { transform: translateY(-1px); }
+
         .print-btn:disabled, .share-btn:disabled, .whatsapp-btn:disabled {
-            background: #ccc;
+            background: #a0a0a0;
             cursor: not-allowed;
+            transform: none;
+            opacity: 0.6;
+        }
+
+        @media (max-width: 600px) {
+            .print-controls {
+                bottom: 20px;
+                padding: 10px 15px;
+                gap: 8px;
+            }
+            .print-btn, .share-btn, .whatsapp-btn {
+                padding: 10px 15px;
+                font-size: 12px;
+            }
         }
 
         @media print {
@@ -476,14 +511,14 @@
             <div class="footer-divider"></div>
             <div class="hospital-col" style="background-color: white; padding: 10px; border-radius: 8px;">
                 <div style="background-color: white; display: inline-block; padding: 5px;">
-                    <img src="moh_logo.png.png" alt="MOH" class="moh-logo" style="height: 100px; width: auto; border: none;">
+                    <img src="moh_logo.png.png" alt="MOH" class="moh-logo" style="height: 140px; width: auto; border: none;">
                 </div>
                 <div class="hospital-name" style="margin-top: 10px;">
                     <div id="v-hosp-ar" style="font-size: 16px; font-weight: bold; color: var(--navy);"></div>
                     <div id="v-hosp-en" style="font-size: 14px; font-family: 'Inter', sans-serif; color: var(--primary);"></div>
                 </div>
                 <div style="background-color: white; display: inline-block; padding: 5px; margin-top: 10px;">
-                    <img src="nhic_logo_new.png" alt="NHIC" class="nhic-logo-footer" style="border: none; height: 110px; width: auto;">
+                    <img src="nhic_logo_new.png" alt="NHIC" class="nhic-logo-footer" style="border: none; height: 150px; width: auto;">
                 </div>
             </div>
             <div class="verify-col">
@@ -684,7 +719,7 @@
                 await new Promise(r => setTimeout(r, 1000));
 
                 const canvas = await html2canvas(element, {
-                    scale: 5,
+                    scale: 3.5, // دقة متوازنة (جودة عالية + أداء سريع)
                     useCORS: true,
                     logging: false,
                     backgroundColor: '#ffffff',
@@ -697,13 +732,14 @@
                     }
                 });
 
-                const imgData = canvas.toDataURL('image/png'); // تغيير الصيغة إلى PNG للحفاظ على الشفافية والدقة
+                // استخدام JPEG بجودة عالية جداً لتقليل حجم الملف مع الحفاظ على صفاء النصوص
+                const imgData = canvas.toDataURL('image/jpeg', 0.95); 
                 const { jsPDF } = window.jspdf;
                 const pdf = new jsPDF('p', 'mm', 'a4');
                 const pdfWidth = pdf.internal.pageSize.getWidth();
                 const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
                 
-                pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight, undefined, 'SLOW');
+                pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight, undefined, 'FAST');
                 const fileName = `Sick_Leave_${leaveId || 'Report'}.pdf`;
 
                 if (target === 'download') {
@@ -724,8 +760,8 @@
                 }
                 imgs.forEach((img, i) => { img.src = originalSrcs[i]; });
             } catch (err) {
-                console.error(err);
-                window.print();
+                console.error('PDF Generation Error:', err);
+                alert('عذراً، حدث خطأ أثناء إنشاء التقرير. يرجى المحاولة مرة أخرى أو استخدام متصفح مختلف.');
             } finally {
                 btns.forEach(b => b.disabled = false);
                 overlay.style.display = 'none';
